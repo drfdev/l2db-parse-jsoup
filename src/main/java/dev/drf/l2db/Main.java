@@ -4,6 +4,8 @@ import dev.drf.l2db.conf.Resource;
 import dev.drf.l2db.data.ResultData;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -12,6 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main {
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
+
     private static final int ATTEMPTS = 3;
     private static final int TIME_TO_SLEEP = 500;
 
@@ -61,17 +65,20 @@ public class Main {
                 done = true;
                 resultData.notFailed();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Get error {} from {}, reconnect...", e.getMessage(), url);
             }
             attempt --;
             if (!done) {
                 try {
                     Thread.sleep(TIME_TO_SLEEP);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                     attempt = -1;
                 }
             }
+        }
+        if (resultData.isFailed()) {
+            log.error("Failed {}", url);
         }
         return resultData;
     }

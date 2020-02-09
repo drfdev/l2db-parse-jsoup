@@ -23,7 +23,7 @@ public enum Resource {
     MOLD_GLUE("Mold Glue", "http://l2db.ru/items/loock/4039/c4", NONE),
     MOLD_HARDENER("Mold Hardener", "http://l2db.ru/items/loock/4041/c4", NONE),
     /* with craft */
-    LEATHER("Leather", "http://l2db.ru/items/loock/1882/c4/", Recipe.builder()
+    LEATHER("Leather", "http://l2db.ru/items/loock/1882/c4", Recipe.builder()
             .addItem(6, ANIMAL_SKIN)
             .build()),
     BRAIDED_HEMP("Braided Hemp", "http://l2db.ru/items/loock/1878/c4", Recipe.builder()
