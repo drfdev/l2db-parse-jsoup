@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,22 +24,29 @@ public class Main {
         System.out.println("start");
 
         final int size = Resource.values().length;
-//        final int cores = Runtime.getRuntime().availableProcessors();
+        final int cores = Runtime.getRuntime().availableProcessors();
 
         Map<Resource, ResultData> parseData = new ConcurrentHashMap<>(size);
-//        ExecutorService pool = Executors.newFixedThreadPool(cores);
+        ExecutorService pool = Executors.newFixedThreadPool(cores);
+        CountDownLatch latch = new CountDownLatch(size);
 
         for (Resource r : Resource.values()) {
-//            pool.execute(() -> {
+            pool.execute(() -> {
                 String url = r.getUrl();
 
                 ResultData resultData = parseUrl(url);
 
                 parseData.put(r, resultData);
-//            });
+                latch.countDown();
+            });
         }
 
-//        pool.shutdown();
+        pool.shutdown();
+        try {
+            latch.await();
+        } catch (InterruptedException ex) {
+            log.error("Await error: ", ex);
+        }
 
         long failedCount = parseData.values().stream()
                 .filter(ResultData::isFailed)
