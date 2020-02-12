@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final String SELECTOR = "article.content > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) > table > tbody > tr > td > a[href^=\"/npc/view/\"]";
+    private static final String PREFIX = "http://l2db.ru";
 
     private static final int ATTEMPTS = 3;
     private static final int TIME_TO_SLEEP = 500;
@@ -67,6 +68,7 @@ public class Main {
         boolean done = false;
 
         while (!done || attempt > 0) {
+            attempt --;
             try {
                 Document doc = Jsoup.connect(url).get();
 
@@ -76,7 +78,6 @@ public class Main {
             } catch (IOException e) {
                 log.error("Get error {} from {}, reconnect...", e.getMessage(), url);
             }
-            attempt --;
             if (!done) {
                 try {
                     Thread.sleep(TIME_TO_SLEEP);
