@@ -4,6 +4,8 @@ import dev.drf.l2db.conf.Resource;
 import dev.drf.l2db.data.ResultData;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final String SELECTOR = "article.content > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) > table > tbody > tr > td > a[href^=\"/npc/view/\"]";
     private static final String PREFIX = "http://l2db.ru";
+    private static final String HREF = "href";
 
     private static final int ATTEMPTS = 3;
     private static final int TIME_TO_SLEEP = 500;
@@ -71,8 +74,8 @@ public class Main {
             attempt --;
             try {
                 Document doc = Jsoup.connect(url).get();
+                parsePage(doc, resultData);
 
-                // TODO
                 done = true;
                 resultData.notFailed();
             } catch (IOException e) {
@@ -91,5 +94,18 @@ public class Main {
             log.error("Failed {}", url);
         }
         return resultData;
+    }
+
+    private static void parsePage(Document doc, ResultData resultData) {
+        Elements links = doc.select(SELECTOR);
+
+        for (Element el : links) {
+            Elements hrefs = el.getElementsByAttribute(HREF);
+            String hrefValue = hrefs.attr(HREF);
+
+            String mobUrl = ( PREFIX + hrefValue );
+
+            // TODO
+        }
     }
 }
